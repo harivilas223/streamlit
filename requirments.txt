@@ -3,4 +3,4 @@ pandas
 numpy
 scikit-learn
 tensorflow
-scikit-learn
+matplotlib.pyplot
