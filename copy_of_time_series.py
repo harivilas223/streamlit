@@ -37,16 +37,16 @@ st.title ('Agitator Amps a forecasting and feature effect')
 st.write('Importing the required python libraries')
 
 import tensorflow as tf
-import matplotlib as mpl
+#import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import os
+#import os
 import pandas as pd
 import streamlit as st
 import pandas as pd
-from enum import Enum
-from io import BytesIO, StringIO
-from typing import Union
+#from enum import Enum
+#from io import BytesIO, StringIO
+#from typing import Union
 
 global df1
 uploaded_file=st.sidebar.file_uploader(label='upload your csv or excel file.' ,type=['csv','xlsx'])
@@ -342,7 +342,7 @@ import numpy as np
 # from sklearn.externals import joblib
 # pip install shap
 # import shap
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
 k=0
 for j in range(1,10):
