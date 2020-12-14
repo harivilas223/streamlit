@@ -47,20 +47,25 @@ import pandas as pd
 #from enum import Enum
 #from io import BytesIO, StringIO
 #from typing import Union
+def data_upload():
+    global df1
+    uploaded_file=st.sidebar.file_uploader(label='upload your csv or excel file.' ,type=['csv','xlsx'])
+    if uploaded_file is not None:
+        st.write('Reading the uploaded file')
+        df1=pd.read_csv(uploaded_file)
+    df=df1.copy()
+    st.write('printing first five rows of the data')
+    st.dataframe(df.head())
+    return df 
 
-global df1
-uploaded_file=st.sidebar.file_uploader(label='upload your csv or excel file.' ,type=['csv','xlsx'])
-if uploaded_file is not None:
-    st.write('Reading the uploaded file')
-    df1=pd.read_csv(uploaded_file)
-           
-df=df1.copy()
-st.write('printing first five rows of the data')
-st.dataframe(df.head())
+    
+#df=df1.copy()
+#st.write('printing first five rows of the data')
+#st.dataframe(df.head())
 # df2=df3[(df3['Timestamp']>'06-02-2019 00:01:00') & (df3['Timestamp']<'06-02-2019 23:59:00')]
-
-col=['Timestamp','TR3 V313 AGITATOR AMPS','T3 ES RSD V313 S','TR3 RSC#A INLET TEMP'
-,'TR3 RSC#B INLET TEMP','TR3 RSC#C INLET TEMP']
+def columns():
+    col=['Timestamp','TR3 V313 AGITATOR AMPS','T3 ES RSD V313 S','TR3 RSC#A INLET TEMP','TR3 RSC#B INLET TEMP','TR3 RSC#C INLET TEMP']
+    return col
 # 'TR3 RSC#A DILUENT FLOW',
 # 'TR3 RSC#B DILUENT FLOW',
 # 'TR3 RSC#C DILUENT FLOW',
@@ -118,26 +123,31 @@ col=['Timestamp','TR3 V313 AGITATOR AMPS','T3 ES RSD V313 S','TR3 RSC#A INLET TE
 # 'TR3 RSC#A INLET TEMP',
 # 'TR3 RSC#B INLET TEMP',
 # 'TR3 RSC#C INLET TEMP']
-
-df=df1[col]
-st.write('Printing the feature names for model building')
-st.write(df.columns)
-# df2=df3[col]
-
-# df2.shape
-st.write('Data preprocessing')
-features = df
-features.index = df['Timestamp']
-features.drop(columns=['Timestamp'],inplace=True)
+def copy1():
+    df=data_upload()
+    col=columns()
+    df=df[col]
+    st.write('Printing the feature names for model building')
+    st.write(df.columns)
+    st.write('Data preprocessing')
+    features = df
+    features.index = df['Timestamp']
+    features.drop(columns=['Timestamp'],inplace=True)
+    return features
+    
+    
+    
 from sklearn import pipeline
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-scaler=pipeline.Pipeline(steps=[
-#     ('z-scale', StandardScaler()),
-     ('minmax', MinMaxScaler(feature_range=(-1, 1))),
-     ('remove_constant', VarianceThreshold())
-])
-df=scaler.fit_transform(features)
+def sacling():
+    features=copy1()
+    scaler=pipeline.Pipeline(steps=[
+      ('z-scale', StandardScaler()),
+         ('minmax', MinMaxScaler(feature_range=(-1, 1))),
+         ('remove_constant', VarianceThreshold())])
+    df=scaler.fit_transform(features)
+    return df
 
 # Commented out IPython magic to ensure Python compatibility.
 
@@ -220,62 +230,64 @@ def multivariate_data(dataset, target, start_index, end_index, history_size,
 #     # a=a+15  
 
 #   return np.array(data), np.array(labels)
-
-future_target = 10
-past_history=60
-TRAIN_SPLIT=100000
-STEP=1
-x_train_multi, y_train_multi = multivariate_data(df, df[:, 0], 0,
-                                                 TRAIN_SPLIT, past_history,
+def model_dev():
+    df=sacling()
+    future_target = 10
+    past_history=60
+    TRAIN_SPLIT=100000
+    STEP=1
+    x_train_multi, y_train_multi = multivariate_data(df, df[:, 0], 0,
+                                                     TRAIN_SPLIT, past_history,
+                                                     future_target, STEP)
+    x_val_multi, y_val_multi = multivariate_data(df, df[:, 0],
+                                                 TRAIN_SPLIT,150000, past_history,
                                                  future_target, STEP)
-x_val_multi, y_val_multi = multivariate_data(df, df[:, 0],
-                                             TRAIN_SPLIT,150000, past_history,
-                                             future_target, STEP)
 
-x_val_multi, y_val_multi = multivariate_data(df, df[:, 0],
-                                             0,1438, past_history,
-                                             future_target, STEP)
-BATCH_SIZE=200
-BUFFER_SIZE=50
-val_data_multi = tf.data.Dataset.from_tensor_slices((x_val_multi, y_val_multi))
-val_data_multi = val_data_multi.batch(BATCH_SIZE).repeat()
+    x_val_multi, y_val_multi = multivariate_data(df, df[:, 0],
+                                                 0,1438, past_history,
+                                                 future_target, STEP)
+    BATCH_SIZE=200
+    BUFFER_SIZE=50
+    val_data_multi = tf.data.Dataset.from_tensor_slices((x_val_multi, y_val_multi))
+    val_data_multi = val_data_multi.batch(BATCH_SIZE).repeat()
 
-print ('Single window of past history : {}'.format(x_train_multi[0].shape))
-print ('\n Target solids to predict : {}'.format(y_train_multi[0].shape))
+    print ('Single window of past history : {}'.format(x_train_multi[0].shape))
+    print ('\n Target solids to predict : {}'.format(y_train_multi[0].shape))
 
-BATCH_SIZE=200
-BUFFER_SIZE=50
-# train_data_multi = tf.data.Dataset.from_tensor_slices((x_train_multi, y_train_multi))
-# train_data_multi = train_data_multi.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+    BATCH_SIZE=200
+    BUFFER_SIZE=50
+    # train_data_multi = tf.data.Dataset.from_tensor_slices((x_train_multi, y_train_multi))
+    # train_data_multi = train_data_multi.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
 
-# val_data_multi = tf.data.Dataset.from_tensor_slices((x_val_multi, y_val_multi))
-# val_data_multi = val_data_multi.batch(BATCH_SIZE).repeat()
-st.write('Building the neural network flow')
+    # val_data_multi = tf.data.Dataset.from_tensor_slices((x_val_multi, y_val_multi))
+    # val_data_multi = val_data_multi.batch(BATCH_SIZE).repeat()
+    st.write('Building the neural network flow')
 
-multi_step_model = tf.keras.models.Sequential()
-multi_step_model.add(tf.keras.layers.LSTM(5,
-                                          return_sequences=True,
-                                          input_shape=x_val_multi.shape[-2:],activation='relu', recurrent_activation='sigmoid'))
-# multi_step_model.add(tf.keras.layers.BatchNormalization())
-# multi_step_model.add(tf.keras.layers.Dropout(0.1))
-# multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,
-#                                           activation='tanh'
-#                                           ))
-# multi_step_model.add(tf.keras.layers.BatchNormalization())
-# multi_step_model.add(tf.keras.layers.Dropout(0.3))
-# multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,
-#                                           activation='tanh'
-#                                           ))
-# multi_step_model.add(tf.keras.layers.BatchNormalization())
-# multi_step_model.add(tf.keras.layers.Dropout(0.3))
-# multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,activation='tanh'))
-# multi_step_model.add(tf.keras.layers.LayerNormalization(axis=1 , center=True , scale=True))
-# multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,activation='tanh'))
-# multi_step_model.add(tf.keras.layers.BatchNormalization())
-multi_step_model.add(tf.keras.layers.LSTM(5, activation='relu'))
-multi_step_model.add(tf.keras.layers.Dense(10,activation='linear', kernel_regularizer=tf.keras.regularizers.l1(0.01)))
-adam=tf.keras.optimizers.Adam(learning_rate=0.04, beta_1=0.9, beta_2=0.99, epsilon=1e-03)
-multi_step_model.compile(optimizer='adam', loss='mae',metrics=['mae'])
+    multi_step_model = tf.keras.models.Sequential()
+    multi_step_model.add(tf.keras.layers.LSTM(5,
+                                              return_sequences=True,
+                                              input_shape=x_val_multi.shape[-2:],activation='relu', recurrent_activation='sigmoid'))
+    # multi_step_model.add(tf.keras.layers.BatchNormalization())
+    # multi_step_model.add(tf.keras.layers.Dropout(0.1))
+    # multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,
+    #                                           activation='tanh'
+    #                                           ))
+    # multi_step_model.add(tf.keras.layers.BatchNormalization())
+    # multi_step_model.add(tf.keras.layers.Dropout(0.3))
+    # multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,
+    #                                           activation='tanh'
+    #                                           ))
+    # multi_step_model.add(tf.keras.layers.BatchNormalization())
+    # multi_step_model.add(tf.keras.layers.Dropout(0.3))
+    # multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,activation='tanh'))
+    # multi_step_model.add(tf.keras.layers.LayerNormalization(axis=1 , center=True , scale=True))
+    # multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,activation='tanh'))
+    # multi_step_model.add(tf.keras.layers.BatchNormalization())
+    multi_step_model.add(tf.keras.layers.LSTM(5, activation='relu'))
+    multi_step_model.add(tf.keras.layers.Dense(10,activation='linear', kernel_regularizer=tf.keras.regularizers.l1(0.01)))
+    adam=tf.keras.optimizers.Adam(learning_rate=0.04, beta_1=0.9, beta_2=0.99, epsilon=1e-03)
+    multi_step_model.compile(optimizer='adam', loss='mae',metrics=['mae'])
+    return multi_step_model
 # multi_step_model.compile(optimizer=tf.keras.optimizers.RMSprop(clipvalue=1.0), loss='mae')
 
 # import tensorflow_addons as tfa
@@ -324,9 +336,11 @@ def multi_step_plot(history, true_future, prediction):
 #                                           steps_per_epoch=EVALUATION_INTERVAL,
 #                                           validation_data=val_data_multi, validation_steps=50
 #                                            ,callbacks=cp_callback,verbose=1)
-st.write('Weight updation through BP algorithm')
-
-multi_step_model.load_weights("C:/Users/Vilas/Desktop/RELIANCE/RIL data/PX4 crystallizer/15mymode.h5")
+def weights():
+    st.write('Weight updation through BP algorithm')
+    multi_step_model=model_dev()
+    multi_step_model.load_weights("C:/Users/Vilas/Desktop/RELIANCE/RIL data/PX4 crystallizer/15mymode.h5")
+    return multi_step_model
 
 # pyplot.plot(multi_step_model.history.history['loss'])
 # pyplot.plot(multi_step_model.history.history['val_loss'])
@@ -343,23 +357,33 @@ multi_step_model.load_weights("C:/Users/Vilas/Desktop/RELIANCE/RIL data/PX4 crys
 # pip install shap
 # import shap
 #from matplotlib import pyplot as plt
+def model_predictons():
+    k=0
+    for j in range(1,10):
+        k=k+1
+        st.set_option('deprecation.showPyplotGlobalUse', False)
+        st.write('forecasting the Amps values')
+        multi_step_plot=weights()
+        st.pyplot(multi_step_plot(x_val_multi[j],y_val_multi[j],multi_step_model.predict(x_val_multi)[j]))
+        orig_out=multi_step_model.predict(x_val_multi)[j]
+        st.write('Calculating the effect of each feature on model forecasting')
+        for i in range(5):  # iterate over the three features
+            new_x = x_val_multi[j:k+1].copy()
+            perturbation = np.random.normal(0.0, 1, size=new_x.shape[:2 ])
+            # print(perturbation[:, :i])
+            new_x[:, :, i] = new_x[:, :, i] + perturbation
+            perturbed_out = multi_step_model.predict(new_x)
+            effect = ((orig_out - perturbed_out) ** 2).mean() ** 0.5
+            st.write(f'Variable {i+1}, perturbation effect: {effect:.4f}')
+    print('completed')
+            
+      
 
-k=0
-for j in range(1,10):
-    k=k+1
-    st.set_option('deprecation.showPyplotGlobalUse', False)
-    st.write('forecasting the Amps values')
-    st.pyplot(multi_step_plot(x_val_multi[j],y_val_multi[j],multi_step_model.predict(x_val_multi)[j]))
-    orig_out=multi_step_model.predict(x_val_multi)[j]
-    st.write('Calculating the effect of each feature on model forecasting')
-    for i in range(5):  # iterate over the three features
-        new_x = x_val_multi[j:k+1].copy()
-        perturbation = np.random.normal(0.0, 1, size=new_x.shape[:2 ])
-        # print(perturbation[:, :i])
-        new_x[:, :, i] = new_x[:, :, i] + perturbation
-        perturbed_out = multi_step_model.predict(new_x)
-        effect = ((orig_out - perturbed_out) ** 2).mean() ** 0.5
-        st.write(f'Variable {i+1}, perturbation effect: {effect:.4f}')
+
+
+if __name__ == '__model_predictons__':
+    model_predictons()
+          
 
 # k=0
 # for j in range(0,10):
