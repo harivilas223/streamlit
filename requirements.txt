@@ -2,5 +2,5 @@ streamlit
 pandas
 numpy
 sklearn
-tensorflow
+tensorflow-cpu
 matplotlib
