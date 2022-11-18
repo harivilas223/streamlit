@@ -7,48 +7,26 @@
 #     https://colab.research.google.com/drive/14CNI4fWs4PjsNBNKQzsXKhgjMbvGVi_J
 # """
 
-# !pip install -U -q PyDrive
-# from pydrive.auth import GoogleAuth
-# from pydrive.drive import GoogleDrive
-# from google.colab import auth
-# from oauth2client.client import GoogleCredentials
-# # Authenticate and create the PyDrive client.
-# auth.authenticate_user()
-# gauth = GoogleAuth()
-
-# gauth.credentials = GoogleCredentials.get_application_default()
-# drive = GoogleDrive(gauth)
-
-# # link='https://drive.google.com/open?id=1CAD4CCx4Tgx0cU-zlt-EdlS0EjE73Fvg'
-# link='https://drive.google.com/open?id=1CAD4CCx4Tgx0cU-zlt-EdlS0EjE73Fvg'
-# fluff, id = link.split('=')
-# print (id)
-# downloaded = drive.CreateFile({'id':id}) 
-# downloaded.GetContentFile('T3_merge_data.csv')
-# from __future__ import absolute_import, division, print_function, unicode_literals
-# try:
-# #   %tensorflow_version only exists in Colab.
-#     tensorflow_version 2.0
-# except Exception:
-#     pass
+##importing Streamlit package
 import streamlit as st
-st.title ('Agitator Amps a forecasting and feature effect')
-
+##giving the title to stramlit project
+st.title ('Current forecasting and feature effect')
+##writing first command in streamlit
 st.write('Importing the required python libraries')
-
+##importing required libraries
 import tensorflow as tf
-#import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-#import os
 import pandas as pd
 import streamlit as st
 import pandas as pd
+from sklearn import pipeline
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 st.write('Importing the required python libraries')
-#from enum import Enum
-#from io import BytesIO, StringIO
-#from typing import Union
+##defining the main function
 def main():
+    ##defining the file upload function when user open stramlit link(deployed in heroku)
     def upload():
         global df1
         uploaded_file=st.sidebar.file_uploader(label='upload your csv or excel file.' ,type=['csv','xlsx'])
@@ -60,73 +38,17 @@ def main():
             st.dataframe(df.head())
             return df
          
-    #df=df1.copy()
-    #st.write('Importing the required python libraries') 
-    #st.write('printing first five rows of the data')
-    #st.dataframe(df.head())
-    # df2=df3[(df3['Timestamp']>'06-02-2019 00:01:00') & (df3['Timestamp']<'06-02-2019 23:59:00')]
+    st.write('Importing the required python libraries') 
+    st.write('printing first five rows of the data')
+    st.dataframe(df.head())
+    ##defining the columns function to selected columns
     def columns():
         col=['Timestamp','TR3 V313 AGITATOR AMPS','T3 ES RSD V313 S','TR3 RSC#A INLET TEMP','TR3 RSC#B INLET TEMP','TR3 RSC#C INLET TEMP']
         return col
-# 'TR3 RSC#A DILUENT FLOW',
-# 'TR3 RSC#B DILUENT FLOW',
-# 'TR3 RSC#C DILUENT FLOW',
-# 'TR3 RSC#D DILUENT FLOW',
-# 'TR3 RSC#E DILUENT FLOW',
-# 'TR3 P307 OUTLET FLOW',
-# 'TR3 RSC#A INLET FLOW CONTR',
-# 'TR3 RSC#B INLET FLOW CONTR',
-# 'TR3 RSC#C INLET FLOW CONTR',
-# 'TR3 RSC#D INLET FLOW CONTR',
-# 'TR3 RSC#E INLET FLOW CONTR',
-# # 'TR3 RSC#F INLET FLOW CONTR',
-# 'TR3 P301A/B S/B FLOW CONTR',
-# 'TR3 ES REJ-RSCF A-C FLOW CONTR',
-# 'TR3 ES REJ-RSCF D-F FLOW CONTR',
-# 'TR3 P316 OUTLET FLOW CONTR',
-# 'TR3 P307A/B S/B FLOW CONTR',
-# 'TR3 P306A AMPS',
-# 'TR3 P306B AMPS',
-# 'TR3 P307A AMPS',
-# 'TR3 P307B AMPS',
-# 'TR3 RSC#A AMPS',
-# 'TR3 RSC#B AMPS',
-# 'TR3 RSC#C AMPS',
-# 'TR3 RSC#D AMPS',
-# 'TR3 RSC#E AMPS',
-# 'TR3 RSC#F AMPS',
-# 'TR3 V322 LEVEL', 
-# 'TR3 V322 LEVEL',  
-# 'TR3 V300321 LEVEL',  
-# 'TR3 V300321 LEVEL',  
-# 'TR3 V313 LEVEL',  
-# 'TR3 V313 LEVEL',  
-# 'TR3 V313 LEVEL',  
-# 'TR3 V314 LEVEL',  
-# 'TR3 V314 LEVEL',  
-# 'TR3 V314 LEVEL',  
-# 'TR3 V307 LEVEL',  
-# 'TR3 V307 LEVEL',
-# 'TR3 V309 LEVEL',  
-# 'TR3 V309 LEVEL',  
-# 'TR3 RSC#A INLET SOLIDS',
-# 'TR3 RSC#B INLET SOLIDS',
-# 'TR3 RSC#C INLET SOLIDS',
-# 'TR3 RSC#D INLET SOLIDS',
-# 'TR3 RSC#E INLET SOLIDS',
-# 'TR3 RSC#F FEED SOLIDS',
-# 'TR3 RS RFD OVR FLW I/L TEMP',
-# 'TR3 ESRSD V313 TEMP',
-# # 'TR3 P306A/B O/L TEMP',
-# 'TR3 ESRSD V314 TEMP',
-# 'TR3 ESRSD V314 TEMP',
-# 'TR3 ESRFD TEMP',
-# 'TR3 PS RFD TEMP',
-# 'TR3 RSC#A INLET TEMP',
-# 'TR3 RSC#B INLET TEMP',
-# 'TR3 RSC#C INLET TEMP']
+    ##caling both columns and upload functions
     col=columns()
     df=upload()
+    ##defing the copy1 function for selected columns and making timestamp as index
     def copy1(col,df):
         #df=data_upload()
         #col=columns()
@@ -138,13 +60,9 @@ def main():
         features.index = df['Timestamp']
         features.drop(columns=['Timestamp'],inplace=True)
         return features
-    
-    
-    
-    from sklearn import pipeline
-    from sklearn.feature_selection import VarianceThreshold
-    from sklearn.preprocessing import StandardScaler, MinMaxScaler
+    ##calling the copy1 function
     features=copy1(col,df)
+    ##defing the scaling function for data normalization
     def sacling(features):
         #features=copy1()
         scaler=pipeline.Pipeline(steps=[
@@ -153,8 +71,6 @@ def main():
              ('remove_constant', VarianceThreshold())])
         df=scaler.fit_transform(features)
         return df
-
-    # Commented out IPython magic to ensure Python compatibility.
 
 
 
@@ -183,7 +99,7 @@ def main():
             plt.xlim([time_steps[0], (future+5)*2])
             plt.xlabel('Time-Step')
             return plt
-
+    ##creating the 3d array(batch_size,lookback,features) for model input
     def multivariate_data(dataset, target, start_index, end_index, history_size,
                           target_size, step, single_step=False):
         data = []
@@ -204,39 +120,9 @@ def main():
 
         return np.array(data), np.array(labels)
 
-    # def multivariate_data(dataset, target,start_index, end_index, history_size,
-    #                       target_size, step, single_step=False):
-    #   data = []
-    #   labels = []
-    #   # labels1=[]
-    #   # labels2=[]
-      
-    #   start_index = start_index + history_size
-    #   if end_index is None:
-    #     end_index = len(dataset) - target_size
-    #   # a=0
-    #   for i in range(start_index, end_index,history_size):
-    #     # i=a+i
-    #     indices = range(i-history_size, i, step)
-    #     data.append(dataset[indices])
-
-    #     if single_step:
-    #       labels.append(target[i+target_size])
-    #     else:
-    #       labels.append(target[i:i+target_size])
-
-    #     # if single_step:
-    #     #   labels1.append(target1[i+target_size])
-    #     # else:
-    #     #   labels1.append(target1[i:i+target_size])
-    #     # if single_step:
-    #     #   labels2.append(target2[i+target_size])
-    #     # else:
-    #     #   labels2.append(target2[i:i+target_size])
-    #     # a=a+15  
-
-    #   return np.array(data), np.array(labels)
+    ##calling the scaling function
     df=sacling(features)
+    ##defing the model_dev function for doing data spliting and model development
     def model_dev(df):
         #df=sacling()
         future_target = 10
@@ -250,16 +136,7 @@ def main():
                                                      TRAIN_SPLIT,150000, past_history,
                                                      future_target, STEP)
 
-        #x_val_multi, y_val_multi = multivariate_data(df, df[:, 0],
-         #                                            0,1438, past_history,
-          #                                           future_target, STEP)
-        #BATCH_SIZE=200
-        #BUFFER_SIZE=50
-        #val_data_multi = tf.data.Dataset.from_tensor_slices((x_val_multi, y_val_multi))
-        #val_data_multi = val_data_multi.batch(BATCH_SIZE).repeat()
 
-        #print ('Single window of past history : {}'.format(x_train_multi[0].shape))
-        #print ('\n Target solids to predict : {}'.format(y_train_multi[0].shape))
 
         BATCH_SIZE=200
         BUFFER_SIZE=50
@@ -274,12 +151,12 @@ def main():
         multi_step_model.add(tf.keras.layers.LSTM(5,
                                                   return_sequences=True,
                                                   input_shape=x_val_multi.shape[-2:],activation='relu', recurrent_activation='sigmoid'))
-        # multi_step_model.add(tf.keras.layers.BatchNormalization())
-        # multi_step_model.add(tf.keras.layers.Dropout(0.1))
-        # multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,
-        #                                           activation='tanh'
-        #                                           ))
-        # multi_step_model.add(tf.keras.layers.BatchNormalization())
+        multi_step_model.add(tf.keras.layers.BatchNormalization())
+        multi_step_model.add(tf.keras.layers.Dropout(0.1))
+        multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,
+                                                  activation='tanh'
+                                                   ))
+        multi_step_model.add(tf.keras.layers.BatchNormalization())
         # multi_step_model.add(tf.keras.layers.Dropout(0.3))
         # multi_step_model.add(tf.keras.layers.LSTM(5,return_sequences=True,
         #                                           activation='tanh'
@@ -296,17 +173,8 @@ def main():
         multi_step_model.compile(optimizer='adam', loss='mae',metrics=['mae'])
         st.write('Weight updation through BP algorithm')
         #multi_step_model,x_val_multi,y_val_multi=model_dev()
-        multi_step_model.load_weights("C:/Users/Vilas/Desktop/RELIANCE/RIL data/PX4 crystallizer/15mymode.h5")
         return multi_step_model ,x_val_multi,y_val_multi
-    # multi_step_model.compile(optimizer=tf.keras.optimizers.RMSprop(clipvalue=1.0), loss='mae')
-
-    # import tensorflow_addons as tfa
-
-    # for e in zip(multi_step_model.layers[0].trainable_weights, multi_step_model.layers[0].get_weights()):
-    #     print('Param %s:\n%s' % (e[0],e[1]))
-
-    # """Plotting a sample data-point."""
-
+   
     def multi_step_plot(history, true_future, prediction):
         plt.figure(figsize=(12, 6))
         num_in = create_time_steps(len(history))
@@ -354,15 +222,12 @@ def main():
     # pyplot.xlabel('epoch')
     # pyplot.legend(['train', 'validation'], loc='upper right')
     # pyplot.show()
-
-    # import matplotlib.pyplot as pyplot
-
-    #import numpy as np
-    # from sklearn.externals import joblib
-    # pip install shap
+    from sklearn.externals import joblib
+    pip install shap
     # import shap
     #from matplotlib import pyplot as plt
     multi_step_model,x_val_multi,y_val_multi=model_dev(df)
+    ##defing the model_predictions function check the perturbation effect
     def model_predictons( multi_step_model,x_val_multi,y_val_multi):
         k=0
         for j in range(1,10):
@@ -384,62 +249,7 @@ def main():
     model_predictons( multi_step_model,x_val_multi,y_val_multi) 
                 
     
-
+##calling the main function 
 if __name__ == '__main__':
     main()
-          
 
-# k=0
-# for j in range(0,10):
-#  k=k+1
-#  print(y_val_multi[j:k+1],multi_step_model.predict(x_val_multi[j:k+1]))
-
-# for x, y in val_data_multi.take(10):
-#  print(y_val_multi[:10],y[0])
-
-# # dataframe=pd.DataFrame()
-# for x, y in val_data_multi.take(10):
-#   print(y[0],multi_step_model.predict(x)[0])
-#   # dataset=(pd.DataFrame(y[0],multi_step_model.predict(x)[0]))
-#   # dataframe=pd.concat([dataframe,dataset])
-
-# dataframe['pred']=dataframe.index
-# dataframe.reset_index(drop=True,inplace=True)
-# dataframe.rename(columns={0:'actual'},inplace=True)
-
-# dataframe['diff']=dataframe['actual']-dataframe['pred']
-
-# dataframe.to_csv('v313_2_prediction.csv')
-
-# df['Timestamp']=pd.to_datetime(df['Timestamp'],format = '%d-%m-%Y %H:%M')
-
-# def func_daywise_spool1(data):
-#     new_list = []
-#     list_init = []
-#     print_flag = False
-#     for row, data in data.iterrows(): 
-#         d = {}
-#         d1 = {}
-# #         list_timestamp.append(data['Spool-1_Length_Count_Actual'])
-#         list_init = [data['Timestamp']]
-# #         new_list = list_init + new_list
-#         new_list = new_list + list_init
-# #     print(new_list[0],new_list[-1])
-#     d['Start_time'] = new_list[0]
-#     d1['End_time'] =  new_list[-1]
-#     strt_data = pd.DataFrame([d['Start_time'],d1['End_time']])
-# #     end_data = pd.DataFrame(d1['End_time'])
-    
-#     return strt_data
-
-# df['date']=df['Timestamp'].dt.date
-# v314=df.groupby(['date']).apply(lambda x:func_daywise_spool1(x))
-
-# solid_c12=v314[v314['level_1']==0]
-# solid_c13=v314[v314['level_1']==1]
-# solid_c12.reset_index(inplace=True)
-# solid_c13.reset_index(inplace=True)
-# deriming2=pd.concat([solid_c12,solid_c13],axis=1)
-# deriming2=deriming2.drop(columns=['index','level_1'],axis=1)
-# deriming2.drop(columns=['date'],inplace=True)
-# deriming2.columns=['starttime','endtime']
