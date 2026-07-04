@@ -1,0 +1,386 @@
+00:00 [Music]
+00:05 hi I'm Jeff Jonas the founder and CEO of
+00:08 stenzing
+00:09 I have spent at least 30 hours creating
+00:12 this visual to explain entity resolution
+00:15 I think of it as in slow motion because
+00:17 what's really happening is thousands of
+00:20 Records a second entity resolution
+00:21 decisions are being made what I'm going
+00:23 to do here is I'm going to explain step
+00:25 by step call it a deep dive about what's
+00:28 happening behind the scenes what kind of
+00:30 decisions are being made and I'll tell
+00:32 you what it's easier said than done
+00:34 so many people think it would be so easy
+00:36 to do energy resolution and
+00:39 so many of these moves I'm about to show
+00:41 you are super expensive to make entity
+00:43 resolution due in real time but let's
+00:45 get started okay
+00:47 take a look at these three records what
+00:50 do you think would become of these three
+00:51 records or is it going to become three
+00:53 different people is it one is it one
+00:55 person does it turn into two people
+00:58 now only less than one in a thousand
+01:01 people will get this right over these
+01:03 next 10 moves
+01:04 so you might want to pause along this
+01:06 way on the journey if you want to give
+01:08 yourself a self-test and see if you're
+01:09 one of those 100 000 okay
+01:11 but take a look there
+01:13 well I'll tell you what it's going to
+01:14 become one person it becomes entity E1
+01:17 Rob Bob Robert all part of the same name
+01:20 family the date of births are different
+01:21 but only the month and day transposed
+01:23 phone number structure different but
+01:25 there's enough evidence there to have
+01:27 very high confidence that that is one
+01:29 person and so we assert it's one
+01:32 now this is a form of fuzzy matching
+01:35 anybody can match exact matching where
+01:37 everything is exactly the same but data
+01:39 as you know it's got a lot of fuzziness
+01:41 to it if you want to figure out things
+01:43 are the same you got to see through
+01:44 things like some phone numbers have a
+01:46 plus one and some don't
+01:47 okay let's go on to record number four
+01:51 okay the email is the same as record one
+01:54 you notice that you probably also notice
+01:56 the last name's the same but it's
+01:58 Patricia versus Bob some families
+02:02 share email addresses
+02:06 and so really this is different people
+02:09 and of course so this one's not that
+02:10 hard really we would call this a derived
+02:12 relationship if you want to do really
+02:13 good entity resolution you've got to be
+02:15 able to see relationships as well and
+02:17 this uh uh derived relationship is
+02:20 created and persisted it's remembered uh
+02:23 in in the in the index about the
+02:25 entities
+02:26 let's move on to record five and this is
+02:29 a freebie there's no work at all this is
+02:30 what we would call a disclose
+02:31 relationship the machine The Entity
+02:34 resolution process is not
+02:36 uh detecting it you're told this is like
+02:38 corporate hierarchies data that you
+02:40 might get from a data a data provider or
+02:42 maybe your bank account has a spouse or
+02:45 a co-signer you're not guessing that
+02:46 those people are related this is a
+02:49 disclosed relationship okay now it's
+02:52 going to get a little more tricky take a
+02:53 look at record six
+02:56 to speed it up compare it mainly to
+02:58 record one and what are you going to do
+02:60 with this
+03:02 you know what the names are basically
+03:04 the same the date of birth the same
+03:07 but boy name and date of birth is not
+03:10 it's a pretty good way to find a match
+03:12 but if you wanted to favor the false
+03:14 negative meaning only putting things
+03:16 together when you're sure you would
+03:17 really best off call that
+03:20 a possible match
+03:22 and so record six becomes entity E4
+03:25 on name and date of birth
+03:28 okay moving on to record seven
+03:31 this is tricky for you know all the
+03:33 prior generations of energy resolution
+03:35 we've done it it would have missed this
+03:36 uh it's expensive to do
+03:40 uh in real time
+03:42 on Big Data
+03:45 record seven has the same email address
+03:46 as record one and four which one is it
+03:49 historically we'd have kind of randomly
+03:51 given it to one or the other
+03:53 that would give you a false positive to
+03:54 tell you the truth and 50 of the time
+03:58 by the way if record seven had the word
+03:59 Street on it would you maybe call it
+04:01 record one just because record four was
+04:03 missing the word Street as if Patricia
+04:05 doesn't live on a street
+04:07 the right answer here is really to hold
+04:09 it out it's a special form of a possible
+04:11 match we call it ambiguous
+04:12 funny true story George Foreman names
+04:15 all five of his sons George
+04:18 if you get George Foreman with a home
+04:19 address and a home phone it could be any
+04:21 one of six people
+04:23 if you randomly assign it to one you've
+04:25 probably made the wrong decision
+04:28 now get this though just to track with
+04:30 me on this if any de2 didn't exist
+04:33 record seven would become part of E1 and
+04:35 you could be pretty confident
+04:37 if ready entity E1 didn't exist records
+04:40 everyone you'd be pretty confident would
+04:41 be part of E2
+04:42 but it's only because both exist and the
+04:45 right answer there's two right answers
+04:46 you have to keep it out
+04:49 okay record number eight
+04:53 compare it mainly to American number two
+04:56 and the question is what's going to
+04:58 become of this
+05:00 uh yeah yeah it'll become part of E1
+05:03 but when you when when record eight
+05:06 combines with E1 and you learn an email
+05:08 address B Smith at work you've you've
+05:11 just learned about that entity
+05:14 and when you've learned that much about
+05:15 that entity what else do you think might
+05:16 happen
+05:20 this is often missed but record uh E6 is
+05:24 suddenly discoverable that that possible
+05:26 match
+05:27 slides right in and so the arrival of
+05:30 record eight causes record six to
+05:33 combine this this is It's
+05:35 self-correcting you see in real time
+05:36 eight fixes the previous possible match
+05:39 oh we also would think of this as
+05:41 re-resolve it re-resolve six upon the
+05:43 arrival of eight
+05:44 okay we've been doing this in our prior
+05:47 generation of engines uh for years but
+05:49 the move I'm about to show you
+05:51 oh we spent probably a year working on
+05:53 this in engineering to do this in real
+05:55 time at scale I mean at billions of
+05:57 Records take a look at record nine
+05:59 okay it's mainly like record three
+06:02 Name ID
+06:04 but get this it it's not one and two
+06:07 because the date of births are so
+06:08 different so I'm going to give you a
+06:10 hint here record nine is going to become
+06:12 a new entity out to the right of entity
+06:13 E1
+06:14 and when it lands there something else
+06:17 is going to happen
+06:20 it's going to pull record three out
+06:22 and this is another form of
+06:24 self-correction and it's unresolving
+06:26 three out of entity one and slides it
+06:29 over into entity
+06:30 E6 doing this in real time at scale is
+06:36 very
+06:37 expensive I'm going to cover that why
+06:41 this is so important in a little bonus
+06:42 section at the end okay
+06:44 and uh so let's carry on for now okay
+06:47 here comes record ten take a look at
+06:49 that
+06:51 most entity resolution engines can't do
+06:54 this move
+06:56 that's because they do record matching
+06:58 so take a look at record 10 and you know
+07:00 what would you do with it does it match
+07:02 record one not sufficient does it match
+07:04 any of the other records
+07:07 not sufficient
+07:09 but in fact
+07:10 record 10 becomes part of E1 we call
+07:14 this entity Centric learning record
+07:16 entity E1 is building up a collection of
+07:19 every name it's seen including akas
+07:21 every address every phone number and
+07:23 it's that collection so we're not taking
+07:25 record 10 and trying to find a record
+07:27 we're taking record 10 and trying to
+07:29 find an entity
+07:30 and this is super important especially
+07:33 in messy data and especially in fraud
+07:36 hunting cases where you're trying to
+07:38 find clever bad people that don't use
+07:40 the same name address and passport
+07:41 number on every record more about why
+07:44 that's important
+07:45 in my little bonus section at the end
+07:48 okay let's take a look at record eight
+07:50 what happens if you delete record eight
+07:54 you know this might happen maybe maybe
+07:56 some data needs to be aged out maybe
+07:58 it's a privacy a lot like gdpr or CCPA
+08:01 the long California when record 8 is
+08:04 deleted you better unlearn record 10 the
+08:08 entity-centric learning record and you
+08:10 better unlearn that record six was a
+08:12 match for sure it can only be a possible
+08:14 match
+08:15 okay
+08:18 um you know what I've just shown you is
+08:19 kind of the basic moves but you know to
+08:21 do anything resolution while you want to
+08:22 be able to do it across script you
+08:24 better know that the Arabic spelling of
+08:25 Muhammad versus how Muhammad is spelled
+08:27 in English
+08:28 um versus Mandarin and all the different
+08:29 variations in English like there's over
+08:31 100 variations of Muhammad the shortest
+08:33 mhd
+08:35 entities can be organizations so instead
+08:38 of names and addresses phones of people
+08:39 it could be names and addresses fax
+08:41 numbers uh corporate URLs and so on
+08:45 and entities can be vessels could be a
+08:47 vessel name and and the IDS that come
+08:49 with with vessels and these These are
+08:51 the kinds of moves those 10 moves are
+08:54 the basic moves that are required to get
+08:56 really highly accurate entity resolution
+08:58 and you can get to
+09:01 some of those without too much effort
+09:03 but to get all of those in real time and
+09:04 scale is very difficult it'll be a
+09:07 miracle if you got them all right if you
+09:09 quizzed yourself like if you were one of
+09:10 those one in a thousand plus you should
+09:11 just shoot me an email at Jeff jonas.com
+09:13 I'll actually want to chat with you
+09:15 that's amazing
+09:17 um okay great
+09:18 so I want to go back now this is the
+09:20 bonus section
+09:22 um when we did record nine I take a look
+09:24 back here at this chart uh record nine
+09:27 cause record three to pull out
+09:30 now imagine that
+09:32 you've ingested a billion records
+09:34 already and record nine shows up not
+09:37 only did you have to figure out it's a
+09:38 new entity you have to ask yourself had
+09:39 I known that in the beginning over the
+09:41 billions of decisions I've made should I
+09:44 have made any of them differently
+09:46 doing that in real time
+09:48 non-trivial if you can't do that in real
+09:51 time take a look at this graph at what
+09:53 happens let's just say for argument's
+09:56 sake the database has a one percent
+09:58 error rate
+10:01 if you can't fix mistakes like that as
+10:03 new records are arriving they're kind of
+10:05 invalidating earlier decisions your
+10:07 database is slowly drifting from truth I
+10:10 heard from a large data aggregator they
+10:11 drift at one percent a month well let's
+10:13 use that number that would mean if
+10:15 January or one percent off
+10:17 at the end of February your database is
+10:19 two percent off then three percent off
+10:20 and then you get the four percent off a
+10:22 quarter later
+10:24 imagine that if you just have a million
+10:26 records you have 40
+10:27 000 mistakes
+10:29 whether you're in the fraud business or
+10:31 you're in healthcare and you're trying
+10:32 to make sure you're giving people the
+10:33 right procedures
+10:34 that's this is important
+10:37 what happens in most batch systems that
+10:39 can't fix themselves is then they have
+10:41 to do a Reload where they reload the
+10:43 data and then it fixes it and then it
+10:46 just starts to slowly drift and four
+10:49 months later at the end of July you're
+10:50 four percent off again these kinds of
+10:52 systems have unstable accuracy
+10:56 and they're fixed with these periodic
+10:57 batch reloads now maybe you're going to
+10:59 do them weekly so you only drift you
+11:00 know you drift a bit less but you have
+11:02 you have the wrong answer over that
+11:04 period of time
+11:06 systems like sending right and real-time
+11:09 transactional energy resolution
+11:11 the new observations reverse earlier
+11:14 assertions they fix the past in real
+11:15 time they're self-correcting you never
+11:17 need to reload it's accurate in every
+11:20 second you know it's funny so often when
+11:21 people measure accuracy they're taking
+11:23 it at a point in time but if you don't
+11:25 factor in that accuracy is drifting
+11:27 you're you have a much less accurate
+11:29 system
+11:31 foreign
+11:33 a little breakout section there
+11:36 and now I want to take you back to
+11:37 record 10. record 10 was entity Centric
+11:39 learning again most record uh most
+11:42 entity resolution systems use record
+11:43 matching does this record match any
+11:45 existing records
+11:47 and as I mentioned you can't catch
+11:49 clever bad people because they don't
+11:52 want their records to match so they
+11:54 change stuff they use a very different
+11:56 Identity or they keep altering the
+11:58 features to prevent it I've more broadly
+12:01 described this as Channel separation
+12:02 it's not always bad you and I do Channel
+12:05 separation
+12:06 if I send you an encrypted uh Excel
+12:09 document and then text you with the
+12:11 password that's Channel separation
+12:14 but clever bad people do this on purpose
+12:16 it's a primary deception tradecraft I
+12:18 first saw this in Vegas
+12:21 um in the in the in the early 90s where
+12:24 people coming in trying to take
+12:26 advantage of the casinos I mean I
+12:27 remember somebody had they had 32
+12:29 different names they had eight different
+12:31 Social Security numbers five different
+12:32 dates of birth and they would use
+12:33 different combinations
+12:35 and and later you know as I saw more of
+12:38 these use cases whether it's you know
+12:40 organized crime whether it's uh uh
+12:43 counterterrorism and protecting
+12:44 countries this is how bad guys get away
+12:46 with things and so what you'll see here
+12:49 in this example is
+12:51 you know you have somebody open an
+12:52 account you haven't known money laundry
+12:53 if somebody's applied for a job you
+12:56 as records you really couldn't see these
+12:58 are all the same and if you want to be
+12:60 able to have really high quality fraud
+13:02 detection
+13:04 stop bad things before they happen left
+13:06 of Boom as some people say
+13:08 you want to be able to do Channel
+13:10 consolidation you want to be able to
+13:11 take these channels that were
+13:13 intentionally segregated and bring them
+13:16 together and so to do that you not only
+13:18 just need entity resolution you need
+13:19 entity resolution that employs this
+13:22 technique called entity Centric learning
+13:25 okay so uh with all of that that's an
+13:28 explainer it's slow motion I've tried to
+13:30 take something that so many different
+13:32 kinds of things that happen in any
+13:33 resolution and I'm trying to reduce it
+13:35 down
+13:36 to the it's most simple form so you can
+13:40 see it in slow motion explained I hope
+13:42 you've enjoyed it thanks
+13:45 [Music]
+13:52 [Music]
